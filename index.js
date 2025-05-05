@@ -6,7 +6,6 @@ require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
-const senha = encodeURIComponent('@Fernandes00'); // vira '%40Fernandes00'
 
 
 // Conexão com MongoDB
@@ -36,6 +35,17 @@ app.post('/webhook', async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+
+app.get('/', (req, res) => {
+  const mongoStatus = mongoose.connection.readyState; // 1 = conectado
+  const status = mongoStatus === 1 ? '🟢 MongoDB conectado' : '🔴 MongoDB desconectado';
+
+  res.json({
+    status: '✅ Webhook online!',
+    mongo: status
+  });
 });
 
 // Exportar para XLSX
