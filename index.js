@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 
 // Conexão com MongoDB
@@ -44,7 +44,7 @@ app.post('/webhook', async (req, res) => {
 app.get('/', (req, res) => {
   const mongoStatus = mongoose.connection.readyState; // 1 = conectado
   const status = mongoStatus === 1 ? '🟢 MongoDB conectado' : '🔴 MongoDB desconectado';
-
+console.log(status)
   res.json({
     status: '✅ Webhook online!',
     mongo: status
@@ -77,5 +77,5 @@ app.get('/export', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em https://webhook-xls-production.up.railway.app`);
+  console.log(`Servidor rodando em https://webhook-xls-production.up.railway.app : ${PORT}`);
 });
