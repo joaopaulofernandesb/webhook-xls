@@ -24,7 +24,7 @@ const DataSchema = new mongoose.Schema({
 
 const DataModel = mongoose.model('WebhookData', DataSchema);
 
-// Middleware
+
 app.use(bodyParser.json());
 
 // Webhook (POST)
