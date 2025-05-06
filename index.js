@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ExcelJS = require('exceljs');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT;
@@ -28,6 +29,7 @@ const DataSchema = new mongoose.Schema({
 const DataModel = mongoose.model('WebhookData', DataSchema);
 
 
+app.use(cors());
 app.use(bodyParser.json());
 
 // Webhook (POST)
