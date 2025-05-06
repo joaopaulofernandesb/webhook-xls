@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const ExcelJS = require('exceljs');
 const bodyParser = require('body-parser');
-require('dotenv').config();
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
