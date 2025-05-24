@@ -68,6 +68,11 @@ app.get('/', (req, res) => {
   });
 });
 
+
+app.get('/metadados/all', async (req,res) =>{
+  const dados = await DataModelFirePower.find({}).toArray()
+res.json(...dados)
+})
 // Exportar dados para XLSX
 app.get('/export', async (req, res) => {
   const data = await DataModel.find();
