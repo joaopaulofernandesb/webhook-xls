@@ -70,7 +70,7 @@ app.get('/', (req, res) => {
 
 
 app.get('/metadados/all', async (req,res) =>{
-  const dados = await DataModelFirePower.find({}).toArray()
+  const dados = await DataModelFirePower.find()
 res.json({...dados})
 })
 // Exportar dados para XLSX
