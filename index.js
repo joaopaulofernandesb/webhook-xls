@@ -24,7 +24,8 @@ const DataSchema = new mongoose.Schema({}, { strict: false });
 
 const DataModel = mongoose.model('Webhook_Artimax', DataSchema);
 const DataModelFirePower = mongoose.model('Webhook_Fire_Power', DataSchema)
-const SessionProfileFirePower = mongoose.model('session_profile', DataSchema)
+const SessionProfileFirePower = mongoose.model('session_profile_fire_power', DataSchema)
+const session_replayProfileFirePower = mongoose.model('session_replay_fire_power', DataSchema)
 
 // Middlewares
 app.use(cors());
@@ -44,6 +45,18 @@ app.post('/artimax/webhook', async (req, res) => {
 });
 
 // Webhook (POST)
+app.post('/fire/power/session_replay', async (req, res) => {
+  try {
+    const data = new session_replayProfileFirePower({ ...req.body });
+    await data.save();
+
+    res.status(201).json({ success: true, data });
+  } catch (err) {
+    console.error('❌ Erro ao salvar:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.post('/fire/power/session_profile', async (req, res) => {
   try {
     const data = new SessionProfileFirePower({ ...req.body });
