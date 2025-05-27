@@ -24,6 +24,7 @@ const DataSchema = new mongoose.Schema({}, { strict: false });
 
 const DataModel = mongoose.model('Webhook_Artimax', DataSchema);
 const DataModelFirePower = mongoose.model('Webhook_Fire_Power', DataSchema)
+const SessionProfileFirePower = mongoose.model('session_profile', DataSchema)
 
 // Middlewares
 app.use(cors());
@@ -41,6 +42,20 @@ app.post('/artimax/webhook', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+// Webhook (POST)
+app.post('/fire/power/session_profile', async (req, res) => {
+  try {
+    const data = new SessionProfileFirePower({ ...req.body });
+    await data.save();
+
+    res.status(201).json({ success: true, data });
+  } catch (err) {
+    console.error('❌ Erro ao salvar:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 
 
 app.post('/fire/power/webhook', async (req, res) => {
@@ -73,6 +88,15 @@ app.get('/metadados/all', async (req,res) =>{
   const dados = await DataModelFirePower.find()
 res.json(dados)
 })
+
+app.get('/metadados/firepower/:id', async (req,res) =>{
+
+  const  session_id = req.params.id
+  console.log(session_id)
+  const dados = await DataModelFirePower.find({session_id})
+res.json(dados)
+})
+
 // Exportar dados para XLSX
 app.get('/export', async (req, res) => {
   const data = await DataModel.find();
