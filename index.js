@@ -45,7 +45,7 @@ app.post('/artimax/webhook', async (req, res) => {
 });
 
 
-app.get('/logzz/webhook', async (req, res) => {
+app.post('/logzz/webhook', async (req, res) => {
   try {
     const data = new DataModelLogzz({ ...req.body });
     await data.save();
