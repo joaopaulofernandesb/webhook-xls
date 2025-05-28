@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI)
 // });
 
 const DataSchema = new mongoose.Schema({}, { strict: false });
-
+const DataModelLogzz = mongoose.model('Webhook_logzz', DataSchema);
 const DataModel = mongoose.model('Webhook_Artimax', DataSchema);
 const DataModelFirePower = mongoose.model('Webhook_Fire_Power', DataSchema)
 const SessionProfileFirePower = mongoose.model('session_profile_fire_power', DataSchema)
@@ -35,6 +35,19 @@ app.use(express.json());
 app.post('/artimax/webhook', async (req, res) => {
   try {
     const data = new DataModel({ ...req.body });
+    await data.save();
+
+    res.status(201).json({ success: true, data });
+  } catch (err) {
+    console.error('❌ Erro ao salvar:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
+app.post('/logzz/webhook', async (req, res) => {
+  try {
+    const data = new DataModelLogzz({ ...req.body });
     await data.save();
 
     res.status(201).json({ success: true, data });
