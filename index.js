@@ -102,24 +102,38 @@ function emitDashboard(type, data) { io.emit('live_event', { type, data }); }
 });
 
 
-app.patch('/api/session-replay', async (req, res) => {
-  const { eventos, sessionId, timestamp, ...resto } = req.body;
-if (Array.isArray(eventos)) {
-  const docs = eventos.map((evento, idx) => ({
-    sessionId,
-    evento, // evento rrweb individual
-    step: idx, // ordem no batch (opcional)
-    ...resto,  // userAgent, utm, produto, etc
-    timestamp,
-  }));
-  await db.collection('session-replay').insertMany(docs);
-  res.status(200).json({ ok: true, count: docs.length });
-} else {
-  // fallback para um único evento, se necessário
-  await db.collection('session-replay').insertOne({ sessionId, evento: eventos, ...resto, timestamp });
-  res.status(200).json({ ok: true, count: 1 });
-}
+app.post('/api/session-replay', async (req, res) => {
+  try {
+    const { eventos, sessionId, timestamp, ...resto } = req.body;
+
+    if (Array.isArray(eventos)) {
+      const docs = eventos.map((evento, idx) => ({
+        sessionId,
+        evento, // evento rrweb individual
+        step: idx, // ordem no batch (opcional)
+        ...resto,  // userAgent, utm, produto, etc
+        timestamp,
+        recebido_em: new Date(),
+      }));
+      await db.collection('session-replay').insertMany(docs);
+      res.status(200).json({ ok: true, count: docs.length });
+    } else {
+      // fallback para um único evento, se necessário
+      await db.collection('session-replay').insertOne({
+        sessionId,
+        evento: eventos,
+        ...resto,
+        timestamp,
+        recebido_em: new Date(),
+      });
+      res.status(200).json({ ok: true, count: 1 });
+    }
+  } catch (err) {
+    console.error("Erro ao salvar session-replay:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
+
 
 
 // --- Session Replay GET ---
