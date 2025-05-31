@@ -133,7 +133,7 @@ app.post('/api/webhook', async (req, res) => {
     const data = req.body;
     await saveData('webhook',data);
     emitDashboard('webhook', req.body);
-    res.json({ ok: true, recebido: tipo || 'unknown' });
+    res.json({ status:200, recebido: data || 'unknown' });
   } catch (err) { res.status(400).json({ ok: false, error: err.message }); }
 });
 
