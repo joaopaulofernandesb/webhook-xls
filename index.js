@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
 function emitDashboard(type, data) { io.emit('live_event', { type, data }); }
 
 // --- Eventos principais
-['session-replay', 'event','engagement', 'profile', 'error', 'mapaseletores'].forEach((coll) => {
+['event','engagement', 'profile', 'error', 'mapaseletores'].forEach((coll) => {
   app.post(`/api/${coll.toLowerCase()}`, async (req, res) => {
     try {
       await saveData(coll, req.body);
@@ -101,11 +101,32 @@ function emitDashboard(type, data) { io.emit('live_event', { type, data }); }
   });
 });
 
+
+app.patch('/api/session-replay', async (req, res) => {
+  const { eventos, sessionId, timestamp, ...resto } = req.body;
+if (Array.isArray(eventos)) {
+  const docs = eventos.map((evento, idx) => ({
+    sessionId,
+    evento, // evento rrweb individual
+    step: idx, // ordem no batch (opcional)
+    ...resto,  // userAgent, utm, produto, etc
+    timestamp,
+  }));
+  await db.collection('session-replay').insertMany(docs);
+  res.status(200).json({ ok: true, count: docs.length });
+} else {
+  // fallback para um único evento, se necessário
+  await db.collection('session-replay').insertOne({ sessionId, evento: eventos, ...resto, timestamp });
+  res.status(200).json({ ok: true, count: 1 });
+}
+});
+
+
 // --- Session Replay GET ---
 app.get('/api/session-replay/:sessionId/:produto', async (req, res) => {
   const { sessionId, produto } = req.params;
   try {
-    const replays = await mongoose.connection.db.collection('sessionReplay')
+    const replays = await mongoose.connection.db.collection('session-replay')
       .find({ sessionId, produto }).sort({ createdAt: 1 }).toArray();
     const eventos = replays.flatMap(doc => doc.eventos || []);
     res.json({ sessionId, produto, eventos });
@@ -121,7 +142,7 @@ app.get('/api/session-report/:sessionId/:produto', async (req, res) => {
       mongoose.connection.db.collection('engagement').find({ sessionId, produto }).toArray(),
       mongoose.connection.db.collection('profile').find({ sessionId, produto }).toArray(),
       mongoose.connection.db.collection('error').find({ sessionId, produto }).toArray(),
-      mongoose.connection.db.collection('sessionReplay').find({ sessionId, produto }).toArray(),
+      mongoose.connection.db.collection('session-replay').find({ sessionId, produto }).toArray(),
     ]);
     res.json({ sessionId, produto, events, engagement, profile, errors, replay });
   } catch (err) { res.status(500).json({ ok: false, error: err.message }); }
