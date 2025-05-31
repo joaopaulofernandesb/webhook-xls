@@ -115,11 +115,11 @@ app.post('/api/session-replay', async (req, res) => {
         timestamp,
         recebido_em: new Date(),
       }));
-      await db.collection('session-replay').insertMany(docs);
+      await mongoose.connection.db.collection('session-replay').insertMany(docs);
       res.status(200).json({ ok: true, count: docs.length });
     } else {
       // fallback para um único evento, se necessário
-      await db.collection('session-replay').insertOne({
+      await mongoose.connection.db.collection('session-replay').insertOne({
         sessionId,
         evento: eventos,
         ...resto,
