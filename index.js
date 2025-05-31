@@ -35,6 +35,11 @@ app.use(express.json({ limit: '25mb' }));
 // --- Helper de coleções
 const produtoCollection = () => mongoose.connection.db.collection('produto');
 function saveData(collection, data) {
+
+  if(collection === 'webhook'){
+    return mongoose.connection.db.collection(collection).insertOne({ ...data, createdAt: new Date() });
+  }
+
   if (!data.sessionId || !data.produto) throw new Error('sessionId e produto são obrigatórios!');
   return mongoose.connection.db.collection(collection).insertOne({ ...data, createdAt: new Date() });
 }
