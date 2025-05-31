@@ -125,8 +125,8 @@ app.get('/api/session-report/:sessionId/:produto', async (req, res) => {
 // --- Webhook integração externa
 app.post('/api/webhook', async (req, res) => {
   try {
-    const { tipo, evento, dados, produto, sessionId } = req.body;
-    await saveData('webhook', { tipo, evento, dados, produto, sessionId, receivedAt: new Date() });
+    const data = req.body;
+    await saveData('webhook',data);
     emitDashboard('webhook', req.body);
     res.json({ ok: true, recebido: tipo || 'unknown' });
   } catch (err) { res.status(400).json({ ok: false, error: err.message }); }
